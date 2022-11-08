@@ -41,6 +41,7 @@ export const CalendarModal = () => {
         notes: '',
         start: new Date(),
         end: addHours( new Date(), 2),
+        persons:[]
     });
 
     const titleClass = useMemo(() => {
@@ -55,7 +56,7 @@ export const CalendarModal = () => {
     useEffect(() => {
       if ( activeEvent !== null ) {
           setFormValues({ ...activeEvent });
-      }    
+      }
       
     }, [ activeEvent ])
     
@@ -66,6 +67,39 @@ export const CalendarModal = () => {
             ...formValues,
             [target.name]: target.value
         })
+    }
+
+    const onAddPerson = event => {
+        event.preventDefault();
+        setFormValues({
+            ...formValues,
+            persons: [
+                ...formValues.persons,
+                { 
+                    nombre:"",
+                    cargo:"",
+                    correo:"",
+                    celular:""
+                }
+            ]
+
+        });
+    }
+
+    const handleFieldChange = event => {
+        event.preventDefault();
+        if(["nombre", "cargo", "correo", "celular"].includes(event.target.name)) {
+            console.log("CAS", event.target.name);
+            let persons = [...formValues.persons];
+            persons[event.target.id][event.target.name] = event.target.value;
+
+            setFormValues({ ...formValues, persons });
+        }else{
+            setFormValues( { [event.target.name]: event.target.value } );
+        }
+
+        console.log("estado", formValues);
+
     }
 
     const onDateChanged = ( event, changing ) => {
@@ -91,8 +125,6 @@ export const CalendarModal = () => {
         }
         
         if ( formValues.title.length <= 0 ) return;
-        
-        console.log(formValues);
 
         // TODO: 
         await startSavingEvent( formValues );
@@ -113,7 +145,9 @@ export const CalendarModal = () => {
     >
         <h1> Nuevo evento </h1>
         <hr />
-        <form className="container" onSubmit={ onSubmit }>
+        <form className="container"
+              onSubmit={ onSubmit }
+        >
 
             <div className="form-group mb-2">
                 <label>Fecha y hora inicio</label>
@@ -169,6 +203,87 @@ export const CalendarModal = () => {
                 ></textarea>
                 <small id="emailHelp" className="form-text text-muted">Información adicional</small>
             </div>
+
+
+
+            <label>Personas Invitadas:</label>
+
+            {
+                formValues.persons && formValues.persons?.map( (personas, index) =>
+
+                                <div  className="form-row" key={index}>
+                                    
+                                <div className="card-body">
+                                    <h5 className="card-title">Invitado {index + 1}</h5>
+                                </div>
+
+                                    <div className="form-group">
+                                        <label for="nombre">Nombre: </label>
+                                        <input 
+                                            type="text"
+                                            className="form-control"
+                                            id={index}
+                                            placeholder="Nombre"
+                                            name="nombre"
+                                            value={ personas.nombre }
+                                            onChange={ handleFieldChange }
+                                        />
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label for="nombre">Cargo: </label>
+                                        <input 
+                                            type="text"
+                                            className="form-control"
+                                            id={index}
+                                            placeholder="Cargo"
+                                            name="cargo"
+                                            value={ personas.cargo }
+                                            onChange={ handleFieldChange }
+                                        />
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label for="nombre">Email: </label>
+                                        <input 
+                                            type="email"
+                                            className="form-control"
+                                            id={index}
+                                            placeholder="Correo"
+                                            name="correo"
+                                            value={ personas.correo }
+                                            onChange={ handleFieldChange }
+                                        />
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label for="nombre">Telefono Celular:</label>
+                                        <input 
+                                            type="number"
+                                            className="form-control"
+                                            id={index}
+                                            placeholder="Celular"
+                                            name="celular"
+                                            value={ personas.celular }
+                                            onChange={ handleFieldChange }
+                                        />
+                                    </div>
+
+                                </div>
+
+                )
+            }   
+
+
+            <button 
+                type="button"
+                className="btn btn-success"
+                onClick={ onAddPerson }
+                onChange={ handleFieldChange }
+            >
+                <i className="fa fa-plus-square"></i>
+                <span> Agregar Participantes</span>
+            </button>
 
             <button
                 type="submit"

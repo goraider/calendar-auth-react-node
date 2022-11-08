@@ -17,7 +17,8 @@ export const FabAddNew = () => {
             user: {
                 _id: '123',
                 name: 'Fernando'
-            }
+            },
+            persons:[]
         });
         openDateModal();
     }
